@@ -4,7 +4,7 @@
 
 [Yuxi Xiao](https://henry123-boy.github.io/), [Jianyuan Wang](https://jytime.github.io/), [Nan Xue](https://xuenan.net/), [Nikita Karaev](https://nikitakaraevv.github.io/), [Iurii Makarov](https://linkedin.com/in/lvoursl), [Bingyi Kang](https://bingykang.github.io/), [Xin Zhu](https://openreview.net/profile?id=~Xing_Zhu2), [Hujun Bao](http://www.cad.zju.edu.cn/home/bao/), [Yujun Shen](https://shenyujun.github.io/), [Xiaowei Zhou](https://www.xzhou.me/)
 
-### [Project Page]() | [BibTeX]() | [Goolge Drive]() 
+### [Project Page]() | [BibTeX]() | [Google Drive]() 
 
 <!-- [Paper V1]() | [Paper V2]() | [Paper V3]() | -->
 
@@ -33,7 +33,7 @@
    - [ ] Final version of Paper at [PAPER.md](./docs/PAPER.md)
    - [ ] Release `SpaTrack2-online`
    - [ ] Training & Evaluation Codes.
-   - [ ] More supports for other Depth Model, *i.e.*, `DepthAnything`, `StereoFoundation`, `UniDepth`, `Metric3D`.
+   - [ ] More supports for other Depth Model, *e.g.*, `DepthAnything`, `StereoFoundation`, `UniDepth`, `Metric3D`.
    - [ ] `Ceres Python Bindings` designed for SpatialTracker and Dynamic Reconstruction.
 
 ## Set up the environment
@@ -68,7 +68,7 @@ By following these steps, you should have a working environment ready to run the
 
 
 ## Quick Start
-We gave two examples to illustrate the usage of `SpaTrack2`. 
+We give two examples to illustrate the usage of `SpaTrack2`. 
 ### Type1: Monocular video as input *(Example0)*
 ```
 python inference.py --data_type="RGB" --data_dir="examples" --video_name="protein" --fps=5
@@ -94,7 +94,7 @@ Please follow the instructions in the [app_3rd README](app_3rd/README.md) to con
 ```
 python -m pip install gradio==5.31.0 pako
 ```
-Our gradio demo enable the user to track the points on the target object easily, just try:
+Our gradio demo enables the user to track the points on the target object easily, just try:
 ```
 python app.py
 ```
