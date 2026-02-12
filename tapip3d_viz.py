@@ -148,7 +148,7 @@ def process_point_cloud_data(npz_file, output_file, static_html_file=None, width
 
 def main():
     parser = argparse.ArgumentParser()
-    parser.add_argument('input_file', help='Path to the input .result.npz file')
+    parser.add_argument('input_file', help='Path to the input NPZ result file (e.g., videoname_result.npz)')
     parser.add_argument('--width', '-W', type=int, default=256, help='Target width')
     parser.add_argument('--height', '-H', type=int, default=192, help='Target height')
     parser.add_argument('--fps', type=int, default=4, help='Base frame rate for playback')

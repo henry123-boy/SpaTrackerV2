@@ -189,6 +189,7 @@ def run_tracker(model, viser, temp_dir, video_name, grid_size, vo_points, fps=3)
         data_npz_load["visibs"] = vis_pred.cpu().numpy()
         data_npz_load["confs"] = conf_pred.cpu().numpy()
         data_npz_load["confs_depth"] = conf_depth.cpu().numpy()
-        np.savez(os.path.join(out_dir, f'result.npz'), **data_npz_load)
-        
-        print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/result.npz[/bold yellow]")
+        result_filename = f'{video_name}_result.npz'
+        np.savez(os.path.join(out_dir, result_filename), **data_npz_load)
+
+        print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/{result_filename}[/bold yellow]")

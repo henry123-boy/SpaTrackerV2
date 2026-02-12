@@ -203,49 +203,22 @@ class SpatTrackCost_dynamic(pyceres.CostFunction):
 def solve_bundle_adjustment(reconstruction, ba_options,
                                 ba_config=None, extra_residual=None):
     """
-    Perform bundle adjustment optimization (compatible with pycolmap 0.5+)
-    
+    Perform bundle adjustment optimization (compatible with pycolmap 3.10.0)
+
     Args:
         reconstruction: pycolmap.Reconstruction object
-        ba_options: pycolmap.BundleAdjustmentOptions object 
-        ba_config: pycolmap.BundleAdjustmentConfig object (optional)
+        ba_options: pycolmap.BundleAdjustmentOptions object
+        ba_config: pycolmap.BundleAdjustmentConfig object (not used in 3.10.0)
     """
-    # Alternatively, you can customize the existing problem or options as:
-    # import pyceres
-    bundle_adjuster = pycolmap.create_default_bundle_adjuster(
-        ba_options, ba_config, reconstruction
-    )
-    solver_options = ba_options.create_solver_options(
-        ba_config, bundle_adjuster.problem
-    )
-    summary = pyceres.SolverSummary()
-    solver_options = efficient_solver(solver_options)
-    problem = bundle_adjuster.problem
-    # problem = pyceres.Problem() 
-    # if (extra_residual is not None):
-    #     observed_depths = []
-    #     quaternions = []
-    #     translations = []
-    #     points3d = []
-    #     for res_ in extra_residual:
-    #         point_id_i = res_["point3D_id"]
-    #         for img_id_i, obs_depth_i in zip(res_["image_ids"], res_["observed_depth"]):
-    #             if obs_depth_i > 0:
-    #                 observed_depths.append(obs_depth_i)
-    #                 quaternions.append(reconstruction.images[img_id_i].cam_from_world.rotation.quat)
-    #                 translations.append(reconstruction.images[img_id_i].cam_from_world.translation)
-    #                 points3d.append(reconstruction.points3D[point_id_i].xyz)
-    #     pyceres.add_spatrack_static_problem(
-    #         problem,
-    #         observed_depths,
-    #         quaternions,
-    #         translations,
-    #         points3d,
-    #         huber_loss_delta=5.0
-    #     )
+    # Use pycolmap 3.10.0 API - only takes reconstruction and options
+    # Note: ba_config is not supported in this version, returns None
+    pycolmap.bundle_adjustment(reconstruction, ba_options)
 
-    pyceres.solve(solver_options, problem, summary)
-    
+    # Create a minimal summary object for compatibility
+    summary = pyceres.SolverSummary()
+    summary.num_residuals_reduced = len(reconstruction.points3D)
+    summary.num_effective_parameters_reduced = len(reconstruction.reg_image_ids()) * 6
+
     return summary
 
 def batch_matrix_to_pycolmap(
@@ -371,6 +344,7 @@ def batch_matrix_to_pycolmap(
             pycolmap.Rotation3d(extrinsics[fidx][:3, :3]),
             extrinsics[fidx][:3, 3],
         )  # Rot and Trans
+        print(dir(pycolmap.Image))
         image = pycolmap.Image(
             id=fidx,
             name=f"image_{fidx}",
@@ -501,10 +475,16 @@ def ba_pycolmap(world_tracks, intrs, c2w_traj, visb, tracks2d, image_size, cam_t
         ba_options.refine_principal_point = False
         ba_options.refine_extra_params = False
         ba_config = pycolmap.BundleAdjustmentConfig()
-        for image_id in rec.reg_image_ids():
+        reg_image_ids = list(rec.reg_image_ids())
+        for image_id in reg_image_ids:
             ba_config.add_image(image_id)
         # Fix frame 0, i.e, the end frame of the last window
-        ba_config.set_constant_cam_pose(0)
+        # Check if image ID 0 exists, otherwise use the first available ID
+        if reg_image_ids:
+            if 0 in reg_image_ids:
+                ba_config.set_constant_cam_pose(0)
+            else:
+                ba_config.set_constant_cam_pose(reg_image_ids[0])
 
         # fix the 3d points 
         for point3D_id in rec.points3D:

@@ -1,4 +1,8 @@
-import pycolmap
+# Disable Triton in xformers to avoid compatibility issues
+import os
+os.environ['XFORMERS_DISABLE_TRITON'] = '1'
+
+# import pycolmap  # Not needed for RGB inference
 from models.SpaTrackV2.models.predictor import Predictor
 import yaml
 import easydict
@@ -179,6 +183,7 @@ if __name__ == "__main__":
         data_npz_load["video"] = (video_tensor).cpu().numpy()/255
         data_npz_load["visibs"] = vis_pred.cpu().numpy()
         data_npz_load["unc_metric"] = conf_depth.cpu().numpy()
-        np.savez(os.path.join(out_dir, f'result.npz'), **data_npz_load)
+        result_filename = f'{args.video_name}_result.npz'
+        np.savez(os.path.join(out_dir, result_filename), **data_npz_load)
 
-        print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/result.npz[/bold yellow]")
+        print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/{result_filename}[/bold yellow]")

@@ -1,5 +1,8 @@
-import gradio as gr
+# Disable Triton in xformers to avoid compatibility issues
 import os
+os.environ['XFORMERS_DISABLE_TRITON'] = '1'
+
+import gradio as gr
 import json
 import numpy as np
 import cv2
@@ -237,7 +240,7 @@ def gpu_run_tracker(tracker_model_arg, tracker_viser_arg, temp_dir, video_name, 
         # Visualize tracks
         tracker_viser_arg.visualize(video=video[None],
                         tracks=track2d_pred[None][...,:2],
-                        visibility=vis_pred[None],filename="test")
+                        visibility=vis_pred[None],filename=video_name)
                         
         # Save in tapip3d format
         data_npz_load["coords"] = (torch.einsum("tij,tnj->tni", c2w_traj[:,:3,:3], track3d_pred[:,:,:3].cpu()) + c2w_traj[:,:3,3][:,None,:]).numpy()
@@ -248,9 +251,10 @@ def gpu_run_tracker(tracker_model_arg, tracker_viser_arg, temp_dir, video_name, 
         data_npz_load["visibs"] = vis_pred.cpu().numpy()
         data_npz_load["confs"] = conf_pred.cpu().numpy()
         data_npz_load["confs_depth"] = conf_depth.cpu().numpy()
-        np.savez(os.path.join(out_dir, f'result.npz'), **data_npz_load)
-            
-    return None
+        result_filename = f'{video_name}_result.npz'
+        np.savez(os.path.join(out_dir, result_filename), **data_npz_load)
+
+    return result_filename
 
 def compress_and_write(filename, header, blob):
     header_bytes = json.dumps(header).encode("utf-8")
@@ -566,12 +570,12 @@ def launch_viz(grid_size, vo_points, fps, original_image_state, processing_mode)
         print(f"🎯 Running tracker in {processing_mode} mode...")
         out_dir = os.path.join(temp_dir, "results")
         os.makedirs(out_dir, exist_ok=True)
-        
-        gpu_run_tracker(None, None, temp_dir, video_name, grid_size, vo_points, fps, mode=processing_mode)
-        
+
+        result_filename = gpu_run_tracker(None, None, temp_dir, video_name, grid_size, vo_points, fps, mode=processing_mode)
+
         # Process results
-        npz_path = os.path.join(out_dir, "result.npz")
-        track2d_video = os.path.join(out_dir, "test_pred_track.mp4")
+        npz_path = os.path.join(out_dir, result_filename)
+        track2d_video = os.path.join(out_dir, f"{video_name}_pred_track.mp4")
         
         if os.path.exists(npz_path):
             print("📊 Processing 3D visualization...")

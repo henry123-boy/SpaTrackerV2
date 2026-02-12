@@ -17,13 +17,12 @@ albumentations
 matplotlib
 mediapy
 scikit-image
-pycolmap==3.11.1
-git+https://github.com/facebookresearch/segment-anything.git
-git+https://github.com/EasternJournalist/utils3d.git@d3a577acf0a9ad7e513a1416449a07b6f47d967f#egg=utils3d
+pycolmap===3.10.0
+#3.11.1
 huggingface_hub
-pyceres==2.4
-kornia==0.8.1
-xformers==0.0.28
+pyceres>=2.4
+kornia>=0.8.1
+xformers>=0.0.30  # Use newer version for Triton compatibility
 timm
 PyJWT
 gdown
@@ -32,3 +31,5 @@ decord
 ray[default]
 jaxtyping
 transformers
+git+https://github.com/facebookresearch/segment-anything.git
+git+https://github.com/EasternJournalist/utils3d.git@d3a577acf0a9ad7e513a1416449a07b6f47d967f#egg=utils3d

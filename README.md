@@ -114,3 +114,7 @@ python app.py
 ```
 
 
+python inference.py --data_type="RGB" --data_dir="path/to/folder" --video_name="your_video_name" --fps=3
+python inference.py --data_type="RGB" --data_dir="C:\workspace\data\split_videos\split_videos" --video_name="4" --fps=10
+
+python -m pip install opencv-python-headless einops einx decord easydict flow_vis moviepy==1.0.0 safetensors scikit-learn matplotlib mediapy scikit-image pycolmap==3.10.0 pyceres>=2.4 kornia>=0.8.1 xformers>=0.0.28 timm gdown rich decord ray[default] jaxtyping transformers huggingface_hub

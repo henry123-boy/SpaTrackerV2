@@ -216,12 +216,13 @@ if __name__ == "__main__":
                     else:
                         depth_tensor = T.Resize((new_h, new_w))(torch.from_numpy(depth_tensor))
 
+            sequence_name = dyn_check_dir.split("/")[-1]
             if viz:
                 viser.visualize(video=video[None],
                                     tracks=track2d_pred[None][...,:2],
-                                    visibility=vis_pred[None],filename="test")
+                                    visibility=vis_pred[None],filename=sequence_name)
 
-            # save as the tapip3d format   
+            # save as the tapip3d format
             data_npz_load["coords"] = (torch.einsum("tij,tnj->tni", c2w_traj[:,:3,:3], track3d_pred[:,:,:3].cpu()) + c2w_traj[:,:3,3][:,None,:]).numpy()
             data_npz_load["extrinsics"] = torch.inverse(c2w_traj).cpu().numpy()
             data_npz_load["intrinsics"] = intrs.cpu().numpy()
@@ -232,6 +233,7 @@ if __name__ == "__main__":
             data_npz_load["visibs"] = vis_pred.cpu().numpy()
             data_npz_load["unc_metric"] = conf_depth.cpu().numpy()
             data_npz_load["fps"] = fps
-            np.savez(os.path.join(out_dir, f'{dyn_check_dir.split("/")[-1]}.npz'), **data_npz_load)
+            result_filename = f'{sequence_name}.npz'
+            np.savez(os.path.join(out_dir, result_filename), **data_npz_load)
 
-            print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/result.npz[/bold yellow]")
+            print(f"Results saved to {out_dir}.\nTo visualize them with tapip3d, run: [bold yellow]python tapip3d_viz.py {out_dir}/{result_filename}[/bold yellow]")
